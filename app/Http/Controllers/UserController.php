@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
     }
 
 
+
     public function getUsers(){
     $users = User::all();
     return response()->json($users, 200);
@@ -19,7 +20,7 @@ use Illuminate\Http\Request;
     public function index()
     {
     $users = User::all();
-    return $this->successResponse($users);
+    return response()->json($users, 200);
     }
 
     public function add(Request $request ){
@@ -42,6 +43,16 @@ use Illuminate\Http\Request;
 
     }
         public function show($id){
+
+
+// FindOrFail automatically throws an exception if not found
+        $user = User::findOrFail($id);
+        return response()->json(['message' => 'User retrieved successfully', 'data' => $user]);
+
+
+
+
+        /*
     if (!User::find($id)) {
         return response()->json([
             'message' => 'User not found'
@@ -52,10 +63,26 @@ use Illuminate\Http\Request;
         'message' => 'User retrieved successfully',
         'data' => $user
     ]);
+
+    */
+
+
      }
 
     public function delete($id) {
         $user = User::where('id', $id)->first();
+      
+    $user = User::findOrFail($id);
+        $user->delete();
+        return response()->json(['message' => 'User deleted successfully']);
+
+
+
+
+
+
+
+      /*
         if($user){ 
             $user->delete();
             return response()->json([
@@ -66,10 +93,30 @@ use Illuminate\Http\Request;
                 'message' => 'User not found'
             ], 404);
         }
+            */
     }
 
     public function update(Request $request, $id) {
         $user = User::where('id', $id)->first();
+
+
+
+     // I-validate ang update inputs
+        $this->validate($request, [
+            'username' => 'required|string|max:20',
+        ]);
+
+        $user = User::findOrFail($id);
+        $user->update($request->all());
+        
+        return response()->json(['message' => 'User updated successfully', 'data' => $user]);
+
+
+
+
+
+
+        /*
         if($user){ 
             $user->update($request->all());
             return response()->json([
@@ -81,6 +128,8 @@ use Illuminate\Http\Request;
                 'message' => 'User not found'
             ], 404);
         }
+
+        */
     }
 
 
