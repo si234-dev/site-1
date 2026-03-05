@@ -8,14 +8,8 @@ use Illuminate\Http\Response;
 
 
 
-
-
-
-
-
-
-
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
 use Laravel\Lumen\Exceptions\Handler as ExceptionHandler;
@@ -24,7 +18,7 @@ use Throwable;
 
 class Handler extends ExceptionHandler
 {
-
+    use ApiResponser;
     
 
 
@@ -66,40 +60,56 @@ class Handler extends ExceptionHandler
      * @throws \Throwable
      */
     public function render($request, Throwable $exception)
-    {
 
-        //http npofound
-      if ($exception instanceof ValidationException) {
-        return response()->json([
-            'error' => 'Validation Error',
-            'messages' => $exception->errors()
-        ], 422);
-    }
-
-    // 2. Error kon ang User ID wala sa database (User Not Found)
-    if ($exception instanceof ModelNotFoundException) {
-        return response()->json([
-            'error' => 'User not found',
-            'message' => 'ID not found in the database'
-        ], 404);
-    }
-
-    // 3. General HTTP errors (like 405 Method Not Allowed)
+{
+    // http not found
     if ($exception instanceof HttpException) {
-        return response()->json([
-            'error' => 'HTTP Error',
-            'message' => $exception->getMessage()
-        ], $exception->getStatusCode());
+    $code = $exception->getStatusCode();
+    $message = Response::$statusTexts[$code];
+    return $this->errorResponse($message, $code);
     }
 
- 
 
-
-
-        return response()->json([
-            'error' => 'Unexpected Exception',
-            'message' => 'An unexpected error occurred. Please try again later.'
-        ], Response::HTTP_INTERNAL_SERVER_ERROR);
+    // instance not found
+    if ($exception instanceof ModelNotFoundException) {
+    $model = strtolower(class_basename($exception->getModel()));
+    return $this->errorResponse("Does not exist any instance of
+    {$model} with the given id",
+    Response::HTTP_NOT_FOUND);
     }
 
-}
+
+    // validation exception
+    if ($exception instanceof ValidationException) {
+    $errors = $exception->validator->errors()->getMessages();
+    return $this->errorResponse($errors,
+    Response::HTTP_UNPROCESSABLE_ENTITY);
+    }
+
+
+    // access to forbidden
+    if ($exception instanceof AuthorizationException) {
+    return $this->errorResponse($exception->getMessage(),
+    Response::HTTP_FORBIDDEN);
+    }
+
+
+    // unauthorized access
+    if ($exception instanceof AuthenticationException) {
+    return $this->errorResponse($exception->getMessage(),
+    Response::HTTP_UNAUTHORIZED);
+    }
+
+
+    // if your are running in development environment
+    if (env('APP_DEBUG', false)) {
+    return parent::render($request, $exception);
+    }
+
+
+    return $this->errorResponse('Unexpected error. Try later',
+
+
+    Response::HTTP_INTERNAL_SERVER_ERROR);  
+    }
+}   
