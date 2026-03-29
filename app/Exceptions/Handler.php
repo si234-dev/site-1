@@ -15,7 +15,7 @@ use Illuminate\Validation\ValidationException;
 use Laravel\Lumen\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
-
+use GuzzleHttp\Exception\ClientException; 
 class Handler extends ExceptionHandler
 {
     use ApiResponser;
@@ -100,16 +100,24 @@ class Handler extends ExceptionHandler
     Response::HTTP_UNAUTHORIZED);
     }
 
-
+   
     // if your are running in development environment
     if (env('APP_DEBUG', false)) {
     return parent::render($request, $exception);
     }
 
+  if ($exception instanceof ClientException) {
+    /** @var ClientException $exception */
+    $message = $exception->getResponse()->getBody();
+    $code = $exception->getCode();
+    return $this->errorResponse($message, 200);
+}
 
     return $this->errorResponse('Unexpected error. Try later',
 
 
     Response::HTTP_INTERNAL_SERVER_ERROR);  
     }
+
+
 }   

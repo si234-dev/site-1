@@ -14,7 +14,7 @@ class User extends Model{
 
     protected $fillable = [
 
-    'username', 'password'
+    'username', 'password', 'jobid' 
     ];
 
 

@@ -24,3 +24,6 @@ $router->post('/users', 'UserController@add');
 $router->get('/users/{id}', 'UserController@show');     
 $router->delete('/users/{id}', 'UserController@delete');
 $router->put('/users/{id}', 'UserController@update');
+
+$router->get('/userjob', 'UserJobController@index');
+$router->get('/userjob/{id}', 'UserJobController@show');

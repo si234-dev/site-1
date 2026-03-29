@@ -27,6 +27,7 @@ use Illuminate\Http\Request;
     $rules = [
     'username' => 'required|string|unique:users,username|max:20',
     'password' => 'required|string|min:5|max:20',
+    'jobid' => 'required|numeric|min:1|not_in:0',
     
     ];
     
@@ -70,69 +71,33 @@ use Illuminate\Http\Request;
      }
 
     public function delete($id) {
-        $user = User::where('id', $id)->first();
-      
-    $user = User::findOrFail($id);
+        $user = User::findOrFail($id);
         $user->delete();
         return response()->json(['message' => 'User deleted successfully']);
-
-
-
-
-
-
-
-      /*
-        if($user){ 
-            $user->delete();
-            return response()->json([
-                'message' => 'User deleted successfully'
-            ]);
-        } else {
-            return response()->json([
-                'message' => 'User not found'
-            ], 404);
-        }
-            */
-    }
-
-    public function update(Request $request, $id) {
-        $user = User::where('id', $id)->first();
-
-
-
-     // I-validate ang update inputs
-        $this->validate($request, [
-            'username' => 'required|string|max:20',
-        ]);
-
-        $user = User::findOrFail($id);
-        $user->update($request->all());
-        
-        return response()->json(['message' => 'User updated successfully', 'data' => $user]);
-
-
-
-
-
-
-        /*
-        if($user){ 
-            $user->update($request->all());
-            return response()->json([
-                'message' => 'User updated successfully',
-                'data' => $user
-            ]);
-        } else {
-            return response()->json([
-                'message' => 'User not found'
-            ], 404);
-        }
-
-        */
     }
 
 
 
+public function update(Request $request, $id)
+{
+    $this->validate($request, [
+        'username' => 'required|string|max:20',
+        'password' => 'required|string|min:5|max:20'
+    ]);
 
+    $user = User::findOrFail($id);
+
+    $user->username = $request->username;
+    $user->password = $request->password;
+
+    $user->save();
+
+    return response()->json([
+        'message' => 'User updated successfully',
+        'data' => $user
+    ]);
 }
+}
+
+
+
