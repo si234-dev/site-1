@@ -4,7 +4,7 @@ FROM php:8.2-apache
 # Set working directory
 WORKDIR /var/www/html
 
-# Install system dependencies for Lumen
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     libzip-dev zip unzip git \
     && docker-php-ext-install pdo pdo_mysql zip
@@ -20,6 +20,9 @@ RUN composer install --no-dev --optimize-autoloader
 
 # Copy all app files
 COPY . .
+
+# Fix Apache to serve the public folder
+RUN sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf
 
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite
