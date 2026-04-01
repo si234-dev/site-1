@@ -1,0 +1,11 @@
+<?php
+
+
+[phases.setup]
+nixPkgs = ["php82", "php82Extensions.mbstring", "php82Extensions.pdo_mysql", "php82Extensions.tokenizer", "php82Extensions.openssl"]
+
+[phases.build]
+cmds = ["composer install --no-dev"]
+
+[start]
+cmd = "php -S 0.0.0.0:$PORT -t public"
