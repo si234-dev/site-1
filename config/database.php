@@ -1,6 +1,6 @@
 <?php
 return [
-    'default' => env('DB_CONNECTION', 'mysql'),
+    'default' => env('DB_CONNECTION', 'pgsql'),
     'migrations' => 'migrations',
     'connections' => [
         'mysql' => [
