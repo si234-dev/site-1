@@ -1,9 +1,9 @@
 FROM php:8.2-cli
 
-# Install system dependencies
+# Install system dependencies + PostgreSQL driver
 RUN apt-get update && apt-get install -y \
-    git unzip curl libzip-dev \
-    && docker-php-ext-install pdo pdo_mysql zip \
+    git unzip curl libzip-dev libpq-dev \
+    && docker-php-ext-install pdo pdo_pgsql zip \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Composer
