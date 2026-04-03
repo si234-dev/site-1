@@ -43,12 +43,13 @@ $router->get('/env', function() {
 
 
 
-$router->get('/users', 'UserController@getUsers');
-$router->post('/users', 'UserController@add');
-$router->get('/users/{id}', 'UserController@show');     
-$router->delete('/users/{id}', 'UserController@delete');
-$router->put('/users/{id}', 'UserController@update');
+$router->group(['prefix' => 'api'], function () use ($router) {
+    $router->get('/users', 'UserController@getUsers');
+    $router->post('/users', 'UserController@add');
+    $router->get('/users/{id}', 'UserController@show');
+    $router->delete('/users/{id}', 'UserController@delete');
+    $router->put('/users/{id}', 'UserController@update');
 
-$router->get('/userjob', 'UserJobController@index');
-$router->get('/userjob/{id}', 'UserJobController@show');
-
+    $router->get('/userjob', 'UserJobController@index');
+    $router->get('/userjob/{id}', 'UserJobController@show');
+});
