@@ -27,3 +27,12 @@ $router->put('/users/{id}', 'UserController@update');
 
 $router->get('/userjob', 'UserJobController@index');
 $router->get('/userjob/{id}', 'UserJobController@show');
+
+$router->get('/test-db', function () {
+    try {
+        DB::connection()->getPdo();
+        return "DB Connected!";
+    } catch (\Exception $e) {
+        return "DB Connection FAILED: " . $e->getMessage();
+    }
+});
